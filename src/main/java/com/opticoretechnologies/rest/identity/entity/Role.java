@@ -54,16 +54,7 @@ public class Role {
     @Builder.Default
     private Set<User> users = new HashSet<>();
 
-    /**
-     * The permissions granted by this role.
-     * EAGER-loaded because when we evaluate a role, we always need its permissions.
-     */
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "_role_permissions",
-            joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "permission_id", referencedColumnName = "id")
-    )
+
 
 
     // --- Auditing ---
