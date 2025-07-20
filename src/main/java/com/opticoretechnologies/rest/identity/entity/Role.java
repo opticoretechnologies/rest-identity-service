@@ -64,8 +64,7 @@ public class Role {
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id", referencedColumnName = "id")
     )
-    @Builder.Default
-    private Set<Permission> permissions = new HashSet<>();
+
 
     // --- Auditing ---
     @CreationTimestamp
@@ -76,14 +75,7 @@ public class Role {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    // --- Custom Logic Methods ---
-    public void addPermission(Permission permission) {
-        this.permissions.add(permission);
-    }
 
-    public void removePermission(Permission permission) {
-        this.permissions.remove(permission);
-    }
 
     // --- Object Identity Methods ---
     @Override
@@ -104,7 +96,6 @@ public class Role {
         return "Role{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", permissions=" + (permissions != null ? permissions.stream().map(Permission::getName).collect(Collectors.joining(", ")) : "[]") +
                 '}';
     }
 }

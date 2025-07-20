@@ -126,10 +126,12 @@ public class User implements UserDetails {
             log.warn("User ID {} has no roles assigned.", this.id);
             return Collections.emptySet();
         }
-        return this.roles.stream()
-                .flatMap(role -> role.getPermissions().stream()) // Stream all permissions from all roles
-                .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-                .collect(Collectors.toSet()); // Use a Set to ensure no duplicate authorities
+
+
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .distinct() // Ensure unique authorities
+                .collect(Collectors.toSet());
     }
 
     @Override
