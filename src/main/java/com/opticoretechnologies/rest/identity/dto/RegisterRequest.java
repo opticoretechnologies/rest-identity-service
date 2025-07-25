@@ -3,7 +3,14 @@ package com.opticoretechnologies.rest.identity.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 
+
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class RegisterRequest {
     @NotBlank
     @Size(min = 3, max = 20)
