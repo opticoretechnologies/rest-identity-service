@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * Represents a role within the system (e.g., ROLE_ADMIN, ROLE_USER).
  * In this model, the role's name is directly used as the authority granted to a user.
- *
+ * <p>
  * --- Best Practices Implemented ---
  * 1.  @ToString(exclude = "users"): Prevents a StackOverflowError by stopping the chain:
  * Role.toString() -> User.toString() -> Role.toString().

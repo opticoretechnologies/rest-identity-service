@@ -5,7 +5,6 @@ import com.opticoretechnologies.rest.identity.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,7 +27,9 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
     void deleteByToken(String token);
 
     void deleteRevokedTokensByUserId(UUID userId);
+
     void deleteExpiredTokensByUserId(UUID userId);
+
     void deleteAllByUserId(UUID userId);
 
     void deleteByUser(User user);

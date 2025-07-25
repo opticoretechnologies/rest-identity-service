@@ -46,6 +46,7 @@ public class SequrityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider =
@@ -53,6 +54,7 @@ public class SequrityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());    // Set the password encoder.
         return authProvider;
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

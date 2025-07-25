@@ -3,8 +3,8 @@ package com.opticoretechnologies.rest.identity.service;
 
 import com.opticoretechnologies.rest.identity.entity.RefreshToken;
 import com.opticoretechnologies.rest.identity.entity.User;
-import com.opticoretechnologies.rest.identity.repository.RefreshTokenRepository;
 import com.opticoretechnologies.rest.identity.exception.RefreshTokenException;
+import com.opticoretechnologies.rest.identity.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,18 +18,17 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
-    @Value("${app.jwt.refresh-token-expiration-ms}")
-    private Long refreshTokenDurationMs;
     private final TokenHashingService tokenHashingService;
     private final RefreshTokenRepository refreshTokenRepository;
-
+    @Value("${app.jwt.refresh-token-expiration-ms}")
+    private Long refreshTokenDurationMs;
 
     @Transactional
     public String createRefreshToken(User user, String deviceInfo) {
-       String rawToken = generateRawToken();
-       String hashedToken = tokenHashingService.hashToken(rawToken);
+        String rawToken = generateRawToken();
+        String hashedToken = tokenHashingService.hashToken(rawToken);
 
-       RefreshToken refreshToken = RefreshToken.builder()
+        RefreshToken refreshToken = RefreshToken.builder()
                 .token(hashedToken)
                 .user(user)
                 .issuedAt(Instant.now())
@@ -37,8 +36,8 @@ public class RefreshTokenService {
                 .revoked(false)
                 .deviceInfo(deviceInfo)
                 .build();
-       refreshTokenRepository.save(refreshToken);
-       return rawToken;
+        refreshTokenRepository.save(refreshToken);
+        return rawToken;
     }
 
     @Transactional(readOnly = true)
@@ -70,8 +69,7 @@ public class RefreshTokenService {
     }
 
 
-
     private String generateRawToken() {
-        return UUID.randomUUID().toString()+"."+ Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes());
+        return UUID.randomUUID().toString() + "." + Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes());
     }
 }

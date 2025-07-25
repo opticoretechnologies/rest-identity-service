@@ -3,14 +3,10 @@ package com.opticoretechnologies.rest.identity.controller;
 import com.opticoretechnologies.rest.identity.dto.AuthResponse;
 import com.opticoretechnologies.rest.identity.dto.LoginRequest;
 import com.opticoretechnologies.rest.identity.dto.RegisterRequest;
-import com.opticoretechnologies.rest.identity.entity.Role;
-import com.opticoretechnologies.rest.identity.entity.User;
 import com.opticoretechnologies.rest.identity.exception.TokenRefreshException;
 import com.opticoretechnologies.rest.identity.exception.UserAlreadyExistsException;
 import com.opticoretechnologies.rest.identity.service.AuthService;
 import com.opticoretechnologies.rest.identity.service.JwkService;
-import com.opticoretechnologies.rest.identity.repository.RoleRepository;
-import com.opticoretechnologies.rest.identity.repository.UserRepository;
 import com.opticoretechnologies.rest.identity.service.JwtService;
 import com.opticoretechnologies.rest.identity.service.RefreshTokenService;
 import com.opticoretechnologies.rest.identity.utils.CookieUtils;
@@ -21,16 +17,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.Map;
-import java.util.Set;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -49,9 +41,12 @@ public class AuthController {
         authService.register(registerRequest);
         return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
     }
+
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refreshToken(@CookieValue(name = "${app.jwt.refresh-token-cookie-name}", required = false) String rawRefreshToken, HttpServletResponse response) throws TokenRefreshException {
-        if (rawRefreshToken == null) { throw new TokenRefreshException("Refresh token is missing."); }
+        if (rawRefreshToken == null) {
+            throw new TokenRefreshException("Refresh token is missing.");
+        }
         return refreshTokenService.validateRefreshToken(rawRefreshToken)
                 .map(refreshTokenEntity -> {
                     UserDetails userDetails = refreshTokenEntity.getUser();
@@ -83,6 +78,7 @@ public class AuthController {
         authResponse.setTokenType("Bearer");
         return ResponseEntity.ok(authResponse);
     }
+
     @GetMapping("/.well-known/jwks.json")
     public ResponseEntity<Map<String, Object>> getJwkSet() {
         return ResponseEntity.ok(jwkService.getJwkSet().toJSONObject());

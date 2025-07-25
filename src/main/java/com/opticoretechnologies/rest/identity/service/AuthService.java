@@ -30,8 +30,9 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+
     @Transactional
-    public void register(RegisterRequest request) throws  UserAlreadyExistsException {
+    public void register(RegisterRequest request) throws UserAlreadyExistsException {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserAlreadyExistsException("Username is already taken!");
         }
@@ -42,11 +43,12 @@ public class AuthService {
         try {
             userRole = roleRepository.findByName("ROLE_USER").orElseThrow(() -> new RoleNotFoundException("Role USER not found. Please initialize roles."));
         } catch (RoleNotFoundException e) {
-           userRole = roleRepository.save( Role.builder().name("ROLE_USER").description("Default user role").build());
+            userRole = roleRepository.save(Role.builder().name("ROLE_USER").description("Default user role").build());
         }
         User user = User.builder().username(request.getUsername()).email(request.getEmail()).password(passwordEncoder.encode(request.getPassword())).roles(Set.of(userRole)).enabled(true).accountNonLocked(true).build();
         userRepository.save(user);
     }
+
     public AuthResponse login(LoginRequest request, String deviceInfo) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);

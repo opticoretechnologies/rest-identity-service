@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 /**
  * Represents a user, serving as the security principal and aggregate root.
- *
+ * <p>
  * --- Best Practices Implemented ---
  * 1.  @ToString(exclude = {"roles", "refreshTokens"}): Prevents recursion with both Role
  * and RefreshToken entities.

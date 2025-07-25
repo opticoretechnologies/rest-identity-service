@@ -10,13 +10,9 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -28,10 +24,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtService {
+    private final JwkService jwkService;
     @Value("${app.jwt.access-token-expiration-sec}")
     private long accessTokenExpiration;
-
-    private final JwkService jwkService;
 
     public String extractUsername(String token) {
         return extractClaim(token, JWTClaimsSet::getSubject);

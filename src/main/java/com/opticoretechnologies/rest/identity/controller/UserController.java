@@ -6,8 +6,6 @@ import com.opticoretechnologies.rest.identity.dto.UpdatePasswordRequest;
 import com.opticoretechnologies.rest.identity.dto.UpdateUsernameRequest;
 import com.opticoretechnologies.rest.identity.exception.UserAlreadyExistsException;
 import com.opticoretechnologies.rest.identity.service.JwtService;
-
-
 import com.opticoretechnologies.rest.identity.service.UserService;
 import com.opticoretechnologies.rest.identity.utils.CookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -47,10 +46,12 @@ public class UserController {
         // Return the new access token to the client
         return ResponseEntity.ok(AuthResponse.builder().accessToken(newAccessToken).tokenType("Bearer").build());
     }
+
     @GetMapping("/me")
     public ResponseEntity<UserDetails> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(userDetails);
     }
+
     @PatchMapping("/update/username")
     public ResponseEntity<AuthResponse> updateUsername(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody UpdateUsernameRequest request) throws UserAlreadyExistsException {
         AuthResponse authResponse = userService.updateUsername(userDetails.getUsername(), request);

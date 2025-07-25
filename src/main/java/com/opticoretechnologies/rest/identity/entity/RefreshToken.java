@@ -9,7 +9,7 @@ import java.util.UUID;
 
 /**
  * Represents a refresh token for a user, allowing for extended sessions.
- *
+ * <p>
  * --- Best Practices Implemented ---
  * 1.  @ToString(exclude = "user"): Prevents a StackOverflowError by breaking the chain:
  * RefreshToken.toString() -> User.toString() -> RefreshToken.toString().
