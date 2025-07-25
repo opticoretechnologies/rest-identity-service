@@ -20,8 +20,8 @@ import java.util.UUID;
 public class RefreshTokenService {
     @Value("${app.jwt.refresh-token-expiration-ms}")
     private Long refreshTokenDurationMs;
-    private TokenHashingService tokenHashingService;
-    private RefreshTokenRepository refreshTokenRepository;
+    private final TokenHashingService tokenHashingService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
 
     @Transactional
@@ -42,7 +42,7 @@ public class RefreshTokenService {
     }
 
     @Transactional(readOnly = true)
-    Optional<RefreshToken> validateRefreshToken(String rawToken) {
+    public Optional<RefreshToken> validateRefreshToken(String rawToken) {
         String token = tokenHashingService.hashToken(rawToken);
         return refreshTokenRepository.findByToken(token)
                 .filter(rt -> !rt.isRevoked())
