@@ -61,8 +61,9 @@ public class JwkService {
     public JWKSet getJwkSet() {
         lock.readLock().lock();
         try {
-            // The JWKSet constructor automatically creates a view with only public parameters.
-            return new JWKSet((JWK) this.keys);
+
+            List<JWK> jwkList = new ArrayList<>(this.keys);
+            return new JWKSet(jwkList);
         } finally {
             lock.readLock().unlock();
         }

@@ -37,7 +37,8 @@ public class AuthController {
     private final CookieUtils cookieUtils;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) throws RoleNotFoundException, UserAlreadyExistsException {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) throws UserAlreadyExistsException {
+        log.info("Registering user with username: {}", registerRequest.getUsername());
         authService.register(registerRequest);
         return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
     }
@@ -69,12 +70,15 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
-        String deviceInfo = request.getHeader(HttpHeaders.USER_AGENT);
-        AuthResponse authResponse = authService.login(loginRequest, deviceInfo);
-        // The raw refresh token is temporarily stored in the tokenType field
+        String device = request.getHeader(HttpHeaders.USER_AGENT);
+        String ipAddress = request.getRemoteAddr();
+        String deviceInfo = String.format("User-Agent: %s, IP Address: %s", device, ipAddress);
+        AuthResponse authResponse = authService.login(loginRequest, deviceInfo, request);
+//        log.info("Auth response: {}", authResponse.toString());
+
         String rawRefreshToken = authResponse.getTokenType();
         cookieUtils.createRefreshTokenCookie(rawRefreshToken, response);
-        // Set the tokenType to the standard "Bearer" before sending to the client
+
         authResponse.setTokenType("Bearer");
         return ResponseEntity.ok(authResponse);
     }
