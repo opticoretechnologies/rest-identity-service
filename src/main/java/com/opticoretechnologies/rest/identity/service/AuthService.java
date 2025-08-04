@@ -6,11 +6,10 @@ import com.opticoretechnologies.rest.identity.dto.RegisterRequest;
 import com.opticoretechnologies.rest.identity.dto.UserInfo;
 import com.opticoretechnologies.rest.identity.entity.Role;
 import com.opticoretechnologies.rest.identity.entity.User;
-import com.opticoretechnologies.rest.identity.exception.UserAlreadyExistsException;
+import com.opticoretechnologies.rest.identity.exception.DuplicateResourceException;
 import com.opticoretechnologies.rest.identity.repository.RoleRepository;
 import com.opticoretechnologies.rest.identity.repository.UserRepository;
 import com.opticoretechnologies.rest.identity.utils.CookieUtils;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,12 +37,12 @@ public class AuthService {
     private final CookieUtils cookieUtils;
 
     @Transactional
-    public void register(RegisterRequest request) throws UserAlreadyExistsException {
+    public void register(RegisterRequest request) throws DuplicateResourceException {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UserAlreadyExistsException("Username is already taken!");
+            throw new DuplicateResourceException("Username is already taken!");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new UserAlreadyExistsException("Email is already in use!");
+            throw new DuplicateResourceException("Email is already in use!");
         }
         Role userRole = null;
         try {
@@ -79,8 +78,6 @@ public class AuthService {
                                 .build())
                         .tokenType(newRefreshToken)
                         .build();
-            } else {
-                throw new SecurityException("Invalid or expired refresh token.");
             }
         }
 

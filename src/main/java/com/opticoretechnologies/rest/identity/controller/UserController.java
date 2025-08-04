@@ -4,7 +4,6 @@ package com.opticoretechnologies.rest.identity.controller;
 import com.opticoretechnologies.rest.identity.dto.AuthResponse;
 import com.opticoretechnologies.rest.identity.dto.UpdatePasswordRequest;
 import com.opticoretechnologies.rest.identity.dto.UpdateUsernameRequest;
-import com.opticoretechnologies.rest.identity.exception.UserAlreadyExistsException;
 import com.opticoretechnologies.rest.identity.service.JwtService;
 import com.opticoretechnologies.rest.identity.service.UserService;
 import com.opticoretechnologies.rest.identity.utils.CookieUtils;
@@ -53,7 +52,7 @@ public class UserController {
     }
 
     @PatchMapping("/update/username")
-    public ResponseEntity<AuthResponse> updateUsername(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody UpdateUsernameRequest request) throws UserAlreadyExistsException {
+    public ResponseEntity<AuthResponse> updateUsername(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody UpdateUsernameRequest request)  {
         AuthResponse authResponse = userService.updateUsername(userDetails.getUsername(), request);
         return ResponseEntity.ok(authResponse);
     }

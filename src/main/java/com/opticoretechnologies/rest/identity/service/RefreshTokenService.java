@@ -3,7 +3,7 @@ package com.opticoretechnologies.rest.identity.service;
 
 import com.opticoretechnologies.rest.identity.entity.RefreshToken;
 import com.opticoretechnologies.rest.identity.entity.User;
-import com.opticoretechnologies.rest.identity.exception.RefreshTokenException;
+import com.opticoretechnologies.rest.identity.exception.TokenException;
 import com.opticoretechnologies.rest.identity.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,7 +51,7 @@ public class RefreshTokenService {
     @Transactional
     public String rotateRefreshToken(String rawToken) {
         RefreshToken oldRefreshToken = validateRefreshToken(rawToken)
-                .orElseThrow(() -> new RefreshTokenException("Invalid or expired refresh token"));
+                .orElseThrow(() -> new TokenException("Invalid or expired refresh token"));
 
         oldRefreshToken.setRevoked(true);
         refreshTokenRepository.save(oldRefreshToken);

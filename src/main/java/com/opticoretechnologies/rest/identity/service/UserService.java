@@ -5,7 +5,9 @@ import com.opticoretechnologies.rest.identity.dto.UpdatePasswordRequest;
 import com.opticoretechnologies.rest.identity.dto.UpdateUsernameRequest;
 import com.opticoretechnologies.rest.identity.dto.UserInfo;
 import com.opticoretechnologies.rest.identity.entity.User;
-import com.opticoretechnologies.rest.identity.exception.UserAlreadyExistsException;
+import com.opticoretechnologies.rest.identity.exception.BadRequestException;
+import com.opticoretechnologies.rest.identity.exception.DuplicateResourceException;
+import com.opticoretechnologies.rest.identity.exception.ResourceNotFoundException;
 import com.opticoretechnologies.rest.identity.repository.RefreshTokenRepository;
 import com.opticoretechnologies.rest.identity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,16 +28,16 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final RefreshTokenService refreshTokenService; // <-- Injected RefreshTokenService
+    private final RefreshTokenService refreshTokenService;
+
 
     @Transactional
-    public AuthResponse updateUsername(String currentUsername, UpdateUsernameRequest request) throws UserAlreadyExistsException {
-        // ... same as before
+    public AuthResponse updateUsername(String currentUsername, UpdateUsernameRequest request) throws DuplicateResourceException, UsernameNotFoundException {
         if (userRepository.existsByUsername(request.getNewUsername())) {
-            throw new UserAlreadyExistsException("Username '" + request.getNewUsername() + "' is already taken.");
+            throw new ResourceNotFoundException("USER_NAME" , request.getNewUsername() ,"is already taken");
         }
         User user = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("USER_NAME", request.getNewUsername(),"is already taken"));
         user.setUsername(request.getNewUsername());
         User updatedUser = userRepository.save(user);
         String newAccessToken = jwtService.generateToken(updatedUser);
@@ -45,9 +47,9 @@ public class UserService {
     @Transactional
     public String updatePassword(String username, UpdatePasswordRequest request, String deviceInfo) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Incorrect current password.");
+            throw new BadRequestException("Incorrect current password.");
         }
         // Update password
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));

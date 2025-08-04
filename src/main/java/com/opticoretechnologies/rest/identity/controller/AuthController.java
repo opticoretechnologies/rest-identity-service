@@ -3,8 +3,8 @@ package com.opticoretechnologies.rest.identity.controller;
 import com.opticoretechnologies.rest.identity.dto.AuthResponse;
 import com.opticoretechnologies.rest.identity.dto.LoginRequest;
 import com.opticoretechnologies.rest.identity.dto.RegisterRequest;
-import com.opticoretechnologies.rest.identity.exception.TokenRefreshException;
-import com.opticoretechnologies.rest.identity.exception.UserAlreadyExistsException;
+import com.opticoretechnologies.rest.identity.exception.DuplicateResourceException;
+import com.opticoretechnologies.rest.identity.exception.TokenException;
 import com.opticoretechnologies.rest.identity.service.AuthService;
 import com.opticoretechnologies.rest.identity.service.JwkService;
 import com.opticoretechnologies.rest.identity.service.JwtService;
@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import javax.management.relation.RoleNotFoundException;
 import java.util.Map;
 
 
@@ -37,16 +36,16 @@ public class AuthController {
     private final CookieUtils cookieUtils;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) throws UserAlreadyExistsException {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) throws DuplicateResourceException {
         log.info("Registering user with username: {}", registerRequest.getUsername());
         authService.register(registerRequest);
         return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshToken(@CookieValue(name = "${app.jwt.refresh-token-cookie-name}", required = false) String rawRefreshToken, HttpServletResponse response) throws TokenRefreshException {
+    public ResponseEntity<AuthResponse> refreshToken(@CookieValue(name = "${app.jwt.refresh-token-cookie-name}", required = false) String rawRefreshToken, HttpServletResponse response)  {
         if (rawRefreshToken == null) {
-            throw new TokenRefreshException("Refresh token is missing.");
+            throw new TokenException("Refresh token is missing.");
         }
         return refreshTokenService.validateRefreshToken(rawRefreshToken)
                 .map(refreshTokenEntity -> {
@@ -56,7 +55,7 @@ public class AuthController {
                     cookieUtils.createRefreshTokenCookie(newRawRefreshToken, response); // <-- Use CookieUtils
                     return ResponseEntity.ok(AuthResponse.builder().accessToken(newAccessToken).tokenType("Bearer").build());
                 })
-                .orElseThrow(() -> new TokenRefreshException("Refresh token is invalid or expired!"));
+                .orElseThrow(() -> new TokenException("Refresh token is invalid or expired!"));
     }
 
     @PostMapping("/logout")

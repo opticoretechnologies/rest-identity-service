@@ -27,7 +27,7 @@ spring:
 app:
   jwt:
     access-token-expiration-sec: 900       # 15 minutes
-    refresh-token-expiration-ms: 604800000 # 7 days
+    refresh-token-expiration-ms: 10000 #604800000 # 7 days
     refresh-token-cookie-name: refresh-token
   security:
     login:
